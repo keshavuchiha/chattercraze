@@ -1,5 +1,4 @@
 import type { PageLoad } from './$types';
-import { token } from '$lib/Stores/auth';
 import { browser } from '$app/environment';
 import { error } from '@sveltejs/kit';
 
@@ -25,10 +24,6 @@ export const load: PageLoad = async ({ params, parent, fetch }) => {
 		}
 		res = await fetch('/society/user', {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'x-auth-token': localStorage.getItem('x-auth-token') || ''
-			},
 			body: JSON.stringify({
 				name: params.name
 			})

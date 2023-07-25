@@ -13,7 +13,10 @@ export const load:LayoutServerLoad =async ({params})=>{
     const created_at:Date=res.rows[0].created_at;
     res=await pool.query(`select count from society_members_count where society_id=$1 limit 1;`,
     [society_id]);
-    const count:number=res.rows[0].count;
+    let count=0;
+    if(res.rowCount>0){
+        count=res.rows[0].count;
+    }
     res=await pool.query(`select image_url from society_images where society_id=$1 limit 1;`,
     [society_id]);
     let image_url:null|string=null;

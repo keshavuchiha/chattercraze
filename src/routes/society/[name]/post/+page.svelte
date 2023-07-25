@@ -1,8 +1,7 @@
+
 <script lang="ts">
 	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
-	import Header from '$lib/Components/Header.svelte';
-	import { token } from '$lib/Stores/auth';
 	import ImageIcon from '$lib/assets/Image-Icon.svelte';
 	import LinkIcon from '$lib/assets/Link_Icon.svelte';
 	import Post_Icon from '$lib/assets/Post_Icon.svelte';
@@ -20,10 +19,10 @@
         alert("Content is too long");
     }
     const handlePost=async (event:Event)=>{
-        if(!$page.data.joined){
-            alert("You are not a member of this society");
-            return;
-        }
+        // if(!$page.data.joined){
+        //     alert("You are not a member of this society");
+        //     return;
+        // }
         event.preventDefault();
         const form=new FormData();
         form.append("title",title);
@@ -34,9 +33,6 @@
         }
         const res=await fetch("/society/create/post",{
             method:"POST",
-            headers:{
-                "x-auth-token":$token||""
-            },
             body:form
         })
         if(res.ok){
@@ -46,7 +42,7 @@
             // invalidateAll();
         }
         else{
-            alert("Something went wrong");
+            alert(res.status+" "+res.statusText);
         }
     }
     const handleImageChange=async (event:Event)=>{

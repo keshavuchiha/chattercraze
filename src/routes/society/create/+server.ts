@@ -1,14 +1,16 @@
 import { pool } from "$lib/server/db.js";
 import { verifyToken } from "$lib/utils/verifyToken";
 import { error, json } from "@sveltejs/kit";
+import type { RequestHandler } from "../$types";
 
 
-export const POST=async ({request})=>{
+export const POST:RequestHandler=async ({request,cookies})=>{
     const {name,privacy}=await request.json();
     if(!name || !privacy){
         throw error(401,'Invalid Request');
     }
-    const decoded=await verifyToken(request);
+    const token=cookies.get('x-auth-token');
+    const decoded=await verifyToken(token);
     const {username}=decoded;
     const nameRegex=/[a-zA-Z0-9]+/
     if(!nameRegex.test(name) || name.length>25){
@@ -47,6 +49,7 @@ export const POST=async ({request})=>{
         (user_id, society_id, "role")
         VALUES($1, $2,'creator');
         `,[user_id,society_id,]);
+        await client.query(`refresh materialized view society_members_count;`);
         await client.query('COMMIT');
         return json({status:201}); 
     }
@@ -60,5 +63,6 @@ export const POST=async ({request})=>{
     finally{
         client.release();
     }
+    return json({status:200});
 }
 

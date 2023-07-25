@@ -4,14 +4,15 @@ import { verifyToken } from '$lib/utils/verifyToken';
 import { error, json } from '@sveltejs/kit';
 import { v2 as cloudinary, type UploadApiResponse } from 'cloudinary';
 import multer from 'multer';
-const upload = multer({ dest: 'uploads/' });
+import type { RequestHandler } from '../$types';
+// const upload = multer({ dest: 'uploads/' });
 
 cloudinary.config({
 	cloud_name: CLOUD_NAME,
 	api_key: API_KEY,
 	api_secret: API_SECRET
 })
-export const POST = async ({ request }) => {
+export const POST:RequestHandler = async ({ request ,cookies}) => {
 	// const {username}=verifyToken(request);
 	// console.log(await request.json());
 	const res=await request.formData();
@@ -28,7 +29,8 @@ export const POST = async ({ request }) => {
 			throw error(500,"Error uploading image");
 		}
 	}
-	const {username}=await verifyToken(request);
+	const token=cookies.get('x-auth-token');
+	const {username}=await verifyToken(token);
 	const client=await pool.connect();
 	try{
 		await client.query(`BEGIN`);
@@ -46,6 +48,7 @@ export const POST = async ({ request }) => {
 		if(result.rows.length===0){
 			throw error(403,'User is not a member of the society');
 		}
+		
 		result=await client.query(`insert into posts (title,content,society_id,user_id) values ($1,$2,$3,$4) returning post_id;`,[title,content,society_id,user_id]);	
 		const post_id=result.rows[0].post_id;
 		console.log("post_id",post_id);
@@ -58,17 +61,16 @@ export const POST = async ({ request }) => {
 		}
 		console.log("imageusrl",imageUrl);
 		if(imageUrl){
-			await client.query(`insert into images (post_id,image_url) values ($1,$2);`,[post_id,imageUrl]);
+			await client.query(`insert into post_images (post_id,image_url) values ($1,$2);`,[post_id,imageUrl]);
 		}
 		await client.query(`COMMIT`);
 	} catch(err){
 		await client.query(`ROLLBACK`);
-		throw error(500,"Error creating post");
+		throw err;
 	}	
 	finally{
 		client.release();
 	}
-	
 	// console.log("title",title,content);
 	return json({status:200	});
 };

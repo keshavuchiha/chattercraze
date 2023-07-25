@@ -1,8 +1,9 @@
 import { pool } from '$lib/server/db';
 import { verifyToken } from '$lib/utils/verifyToken.js';
 import { error ,json} from '@sveltejs/kit';
+import type { RequestHandler } from '../$types';
 
-export const POST=async ({request})=>{
+export const POST:RequestHandler=async ({request,cookies})=>{
     const {name}=await request.json();
     console.log("name",name);
     let result=await pool.query(`select society_id from societies where name=$1 limit 1;`,[name]);
@@ -12,7 +13,8 @@ export const POST=async ({request})=>{
     }
     let society_id=result.rows[0].society_id;
     try{
-        const {username}=await verifyToken(request);
+        const token=cookies.get('x-auth-token');
+        const {username}=await verifyToken(token);
         // console.log(username);
         result=await pool.query(`select user_id from users where username=$1 limit 1;`,[username]);
         const user_id=result.rows[0].user_id;

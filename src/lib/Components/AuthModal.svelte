@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
-	import { auth,token } from '$lib/Stores/auth';
+	import { auth} from '$lib/Stores/auth';
 	import Close from '$lib/assets/Close.svelte';
 	// import { clickOutside } from '$lib/utils/clickOutside';
   let username="";
@@ -32,8 +32,8 @@
               return;
             }
             const data=await res.json();
-            localStorage.setItem("x-auth-token",data["x-auth-token"]);
-            $token=data["x-auth-token"];
+            // localStorage.setItem("x-auth-token",data["x-auth-token"]);
+            // $token=data["x-auth-token"];
             $auth.open=false;
             $auth.isLoggedIn=true;
             
@@ -58,8 +58,9 @@
               return;
             }
             const data=await res.json();
-            localStorage.setItem("x-auth-token",data["x-auth-token"]);
-            $token=data["x-auth-token"];
+            // cook
+            // localStorage.setItem("x-auth-token",data["x-auth-token"]);
+            // $token=data["x-auth-token"];
             $auth.open=false;
             $auth.isLoggedIn=true;
           }
@@ -74,7 +75,8 @@
               {:else if $auth.type === 'register'}
                 Create Your Account
               {/if}
-              <button class="text-3xl float-right align-middle text-center items-center text-red-500" on:click={()=>$auth.open=false}><Close/></button>
+
+              <button class="text-3xl float-right align-middle text-center items-center text-red-500" on:click={()=>$auth.open=false}><Close className="h-6 align-middle"/></button>
             </div>
             <br />
             <div class="space-y-4">

@@ -3,13 +3,15 @@ import { pool } from "$lib/server/db";
 import { verifyToken } from "$lib/utils/verifyToken";
 import { error, json } from "@sveltejs/kit";
 import { v2 as cloudinary, type UploadApiResponse } from 'cloudinary';
+import type { RequestHandler } from "../$types";
 cloudinary.config({
 	cloud_name: CLOUD_NAME,
 	api_key: API_KEY,
 	api_secret: API_SECRET
 })
-export const POST=async ({request})=>{
-    const {username}=await verifyToken(request);
+export const POST:RequestHandler=async ({request,cookies})=>{
+    const token=cookies.get('x-auth-token');
+    const {username}=await verifyToken(token);
     const res=await request.formData();
     let {society_name,image}=Object.fromEntries(res);
     const client=await pool.connect();

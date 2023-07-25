@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { token } from '$lib/Stores/auth';
 	import { society } from '$lib/Stores/society';
 	import Close from '$lib/assets/Close.svelte';
 	import PrivateIcon from '$lib/assets/Private_Icon.svelte';
@@ -27,10 +26,6 @@
 				on:submit|preventDefault={async () => {
 					const res = await fetch('/society/create', {
 						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-							'x-auth-token': $token || ""
-						},
 						body: JSON.stringify({
 							name,
 							privacy

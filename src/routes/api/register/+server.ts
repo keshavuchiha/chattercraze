@@ -1,6 +1,6 @@
 import { JWT_SECRET } from '$env/static/private';
 import { pool } from '$lib/server/db.js';
-import { error, json} from '@sveltejs/kit';
+import { error, json, redirect, type RequestHandler} from '@sveltejs/kit';
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 const checkUserName=async (username:string)=>{
@@ -44,7 +44,7 @@ const checkPassword=async (password:string)=>{
         throw error(401,'Invalid Password');
     }
 }
-export const POST = async ({request}) => {
+export const POST:RequestHandler = async ({request,cookies}) => {
     const {username,password,email}=await request.json();
     console.info(username,password,email);
     
@@ -64,7 +64,12 @@ export const POST = async ({request}) => {
 
         const token=jwt.sign({"username":result.rows[0].username},JWT_SECRET,{expiresIn:'1d'});
         // console.info(token);
-        return json({"x-auth-token":token},{status:201});
+        // cookie.set('x-auth-token',token,{});
+        cookies.set('x-auth-token',token,{
+            path:'/',
+        });
+        // throw redirect(301,'/');
+        return json({status:201});
     }
     catch(err){
         throw error(500,'Internal Server Error');

@@ -14,7 +14,7 @@ const auth = writable<Auth>({
     type:"log in",
     open:false,
 });
-const token = writable<string|null>(null);
+// const token = writable<string|null>(null);
 const user = writable<User|null>(null);
 if (browser && localStorage.getItem("x-auth-token")) {
     const temp=localStorage.getItem("x-auth-token");
@@ -27,7 +27,7 @@ if (browser && localStorage.getItem("x-auth-token")) {
         if(res.ok){
             const data=await res.json();
             // console.log(data); 
-            token.set(temp);
+            // token.set(temp);
             user.set(data);
             auth.update((val)=>{
                 return {...val,isLoggedIn:true};
@@ -37,6 +37,6 @@ if (browser && localStorage.getItem("x-auth-token")) {
     // token.set(localStorage.getItem("x-auth-token"));
 }
 
-export {auth,token,user};
+export {auth,user};
 
 
